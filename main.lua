@@ -2,6 +2,7 @@ debug = true
 player = { x = 200, y = 710, speed = 250, img = nil }
 isAlive = true
 score = 0
+health = 3
 
 canShoot = true
 canShootTimerMax = 0.5 
@@ -11,7 +12,7 @@ bulletImg = nil
 
 bullets = {}
 
-createEnemyTimerMax = 0.4
+createEnemyTimerMax = 1
 createEnemyTimer = createEnemyTimerMax
   
 enemyImg = nil  
@@ -22,7 +23,7 @@ background = nil
 function love.load(arg)
     player.img = love.graphics.newImage('assets/aircraft.png')
     bulletImg = love.graphics.newImage('assets/bullet-asm.png')
-    enemyImg = love.graphics.newImage('assets/enemy.png')
+    enemyImg = love.graphics.newImage('assets/enemy-ballmer.png')
     background = love.graphics.newImage('assets/bg.png')
 end
 
@@ -80,6 +81,10 @@ function love.update(dt)
     
         if enemy.y > 850 then -- remove enemies when they pass off the screen
             table.remove(enemies, i)
+            health = health - 1
+            if health <= 0 then
+                isAlive = false
+            end
         end
     end
 
@@ -89,13 +94,19 @@ function love.update(dt)
                 table.remove(bullets, j)
                 table.remove(enemies, i)
                 score = score + 1
+                if createEnemyTimer >= 0.1 then
+                    createEnemyTimer = createEnemyTimer - 0.5
+                end
             end
         end
     
         if CheckCollision(enemy.x, enemy.y, enemy.img:getWidth(), enemy.img:getHeight(), player.x, player.y, player.img:getWidth(), player.img:getHeight()) 
         and isAlive then
             table.remove(enemies, i)
-            isAlive = false
+            health = health - 1
+            if health <= 0 then
+                isAlive = false
+            end
         end
     end
     
@@ -115,6 +126,7 @@ function love.update(dt)
         -- reset our game state
         score = 0
         isAlive = true
+        health = 3
     end
 
 end
@@ -130,6 +142,8 @@ function love.draw(dt)
     love.graphics.draw(background,0,0)
     love.graphics.print("Score:",0,love.graphics.getHeight()-50)
     love.graphics.print(score,50,love.graphics.getHeight()-50)
+    love.graphics.print("Health:",0,love.graphics.getHeight()-25)
+    love.graphics.print(health,50,love.graphics.getHeight()-25)
     -- Draw Player
     if isAlive then
         love.graphics.draw(player.img, player.x, player.y)
