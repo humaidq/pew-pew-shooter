@@ -23,6 +23,8 @@ bulletImgs = {love.graphics.newImage("assets/bullet-asm.png"), love.graphics.new
 
 enemies = {} 
 
+pewAudio = love.audio.newSource("assets/pew.mp3", "static")
+
 math.randomseed(os.time()) -- seed randomiser for images
 
 background = nil
@@ -61,6 +63,8 @@ function love.update(dt)
         table.insert(bullets, newBullet)
         canShoot = false
         canShootTimer = canShootTimerMax
+		pewAudio:stop()
+		pewAudio:play()
     end
 
     -- Update bullet position
