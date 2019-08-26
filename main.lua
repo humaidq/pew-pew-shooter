@@ -7,22 +7,28 @@ canShoot = true
 canShootTimerMax = 0.5 
 canShootTimer = canShootTimerMax
 
-bulletImg = nil
 
 bullets = {}
 
-createEnemyTimerMax = 0.4
+createEnemyTimerMax = 0.9
 createEnemyTimer = createEnemyTimerMax
   
-enemyImg = nil  
+enemyImgs = {love.graphics.newImage("assets/enemy-ballmer.png"), love.graphics.newImage("assets/enemy-erdogan.png"),
+  love.graphics.newImage("assets/enemy-jong-un.png"), love.graphics.newImage("assets/enemy-khomeni.png"),
+  love.graphics.newImage("assets/enemy-zucker.png")}
+
+bulletImgs = {love.graphics.newImage("assets/bullet-asm.png"), love.graphics.newImage("assets/bullet-fork.png"),
+  love.graphics.newImage("assets/bullet-java.png")}
 
 enemies = {} 
+
+math.randomseed(os.time()) -- seed randomiser for images
 
 background = nil
 function love.load(arg)
     player.img = love.graphics.newImage('assets/aircraft.png')
-    bulletImg = love.graphics.newImage('assets/bullet-asm.png')
-    enemyImg = love.graphics.newImage('assets/enemy.png')
+    --bulletImg = love.graphics.newImage('assets/bullet-asm.png')
+    --enemyImg = love.graphics.newImage('assets/enemy-khomeni.png')
     background = love.graphics.newImage('assets/bg.png')
 end
 
@@ -49,7 +55,8 @@ function love.update(dt)
 
     -- Get input from player to shoot
     if love.keyboard.isDown('space', 'rctrl', 'lctrl') and canShoot then
-        newBullet = { x = player.x + (player.img:getWidth()/2), y = player.y, img = bulletImg }
+		randImg = bulletImgs[math.random(#bulletImgs)]
+        newBullet = { x = player.x + (player.img:getWidth()/2), y = player.y, img = randImg }
         table.insert(bullets, newBullet)
         canShoot = false
         canShootTimer = canShootTimerMax
@@ -65,18 +72,19 @@ function love.update(dt)
     end
 
     createEnemyTimer = createEnemyTimer - (1 * dt)
-    if createEnemyTimer < 0 then
+    if createEnemyTimer < 0 and isAlive then
 	    createEnemyTimer = createEnemyTimerMax
 
 	    -- Create an enemy
-	    randomNumber = math.random(10, love.graphics.getWidth() - enemyImg:getWidth())
-	    newEnemy = { x = randomNumber, y = -10, img = enemyImg }
+		randImg = enemyImgs[math.random(#enemyImgs)]
+	    randomNumber = math.random(10, love.graphics.getWidth() - randImg:getWidth())
+	    newEnemy = { x = randomNumber, y = -10, img = randImg }
 	    table.insert(enemies, newEnemy)
     end
 
     -- Update enemy position
     for i, enemy in ipairs(enemies) do
-        enemy.y = enemy.y + (200 * dt)
+        enemy.y = enemy.y + (110 * dt)
     
         if enemy.y > 850 then -- remove enemies when they pass off the screen
             table.remove(enemies, i)
